@@ -66,9 +66,8 @@ class MapSearch:
             self.session.cookies.set(cookie_dict['name'], cookie_dict['value'])
 
     def search_poi(self, city_code, search_key):
-        # 08e7afc7361c9c2d8c6f25408d7e5b4b
         params = {
-            'key': '117630351f2bad74f71d218bf699d39c', 'keywords': search_key,
+            'key': '08e7afc7361c9c2d8c6f25408d7e5b4b', 'keywords': search_key,
             'types': '', 'city': city_code, 'children': '',
             'offset': 20, 'page': 1, 'extensions': 'all'
         }
