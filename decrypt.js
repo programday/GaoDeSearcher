@@ -29,5 +29,3 @@ function get_data(m, d, p) {
         y: parseInt(_)
     }
 }
-
-console.log(get_data(23.107622, 114.347656, 20));
