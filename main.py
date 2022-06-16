@@ -1,4 +1,5 @@
-import time, requests, openpyxl, json, execjs, os
+import time, requests, openpyxl, json, execjs, os, urllib3
+import traceback
 from hashlib import md5
 import pandas as pd
 from urllib.parse import quote
@@ -6,6 +7,8 @@ from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+urllib3.disable_warnings()
 
 
 class MapSearch:
@@ -63,8 +66,9 @@ class MapSearch:
             self.session.cookies.set(cookie_dict['name'], cookie_dict['value'])
 
     def search_poi(self, city_code, search_key):
+        # 08e7afc7361c9c2d8c6f25408d7e5b4b
         params = {
-            'key': '08e7afc7361c9c2d8c6f25408d7e5b4b', 'keywords': search_key,
+            'key': '117630351f2bad74f71d218bf699d39c', 'keywords': search_key,
             'types': '', 'city': city_code, 'children': '',
             'offset': 20, 'page': 1, 'extensions': 'all'
         }
@@ -72,7 +76,7 @@ class MapSearch:
         retry_count = 0
         while retry_count < 3:
             try:
-                search_r = requests.get('https://restapi.amap.com/v3/place/text', params=params)
+                search_r = requests.get('https://restapi.amap.com/v3/place/text', params=params, verify=False)
                 if search_r.json()['status'] == '1':
                     data = search_r.json()['pois']
                     for i in data:
@@ -144,7 +148,7 @@ class MapSearch:
         retry_count = 0
         while retry_count < 3:
             try:
-                r = self.session.post(url, data=data, headers=headers)
+                r = self.session.post(url, data=data, headers=headers, verify=False)
                 if r.json()['status'] == 1:
                     return msg
                 else:
@@ -186,13 +190,13 @@ class MapSearch:
                 add_stats = self.add_favorite(city_code, search_result)
                 if add_stats:
                     print(add_stats)
-                    self.worksheet.cell(row=idx+2, column=2).value = f'存在, 已收录'
+                    self.worksheet.cell(row=idx+2, column=2).value = '存在, 已收录'
                     time.sleep(5)
                 else:
-                    self.worksheet.cell(row=idx + 2, column=2).value = f'不存在'
+                    self.worksheet.cell(row=idx + 2, column=2).value = '不存在'
             else:
                 print(search_result)
-                self.worksheet.cell(row=idx+2, column=2).value = f'不存在'
+                self.worksheet.cell(row=idx+2, column=2).value = '不存在'
 
             self.workbook.save(self.filename)
 
@@ -202,5 +206,9 @@ class MapSearch:
 
 
 if __name__ == '__main__':
-    MapSearch().start()
+    try:
+        MapSearch().start()
+    except:
+        print(traceback.format_exc())
+
     os.system('pause')
